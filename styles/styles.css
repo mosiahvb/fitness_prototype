@@ -1,0 +1,45 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+.meal_input_table {
+    background-color: tan;
+    padding: 5px;
+    /* display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; */
+}
+
+fieldset {
+    margin: 2px;
+    padding: 3px;
+    border: solid 2px black;
+    border-radius: 6px;
+
+}
+legend {
+    font-size: x-large;
+    padding: 2px;
+}
+
+label {
+    display: block;
+}
+input, select {
+    padding: 2px;
+    border: solid 1px black;
+    border-radius: 6px;
+}
+input[type="number"] {
+    width: 5em;
+}
+
+.total{
+    padding: 8px;
+    margin: 5px;
+    margin-top: 10px;
+    background-color: white;
+    border: 2px solid black;
+    border-radius: 8px;
+}

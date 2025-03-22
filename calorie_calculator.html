@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calorie Calculator</title>
+    <link rel="stylesheet" href="/styles/styles.css">
+</head>
+<body>
+    <h1>Calorie Calculator</h1>
+    <div class="meal_input_table">
+        <form id="meal_input">
+            <fieldset>
+                <legend>Meal</legend>
+                <label for="meal">Meal</label>
+                <select name="meal" id="meal">
+                    <option value="Breakfast">Breakfast</option>
+                    <option value="Lunch">Lunch</option>
+                    <option value="Dinner">Dinner</option>
+                    <option value="Snack">Snack</option>
+                </select>
+                <div id="food-items-container">
+                    <div>
+                        <label for="food">Select a food:</label>
+                        <select name="food">
+                            <option value="chicken">Chicken</option>
+                            <option value="rice">Rice</option>
+                            <option value="cottage_cheese">Cottage Cheese</option>
+                        </select>
+                        <input type="number" name="weight" placeholder="g" min="0.1" step="0.1">
+                        <button type="button" onclick="removeFoodItem(this)">Remove</button>
+                    </div>
+                </div>
+                <label for="add">Have more?</label>
+                <button type="button" onclick="addFoodItem()">Add Food</button>
+                <button type="button" onclick="updateTotals()">Update Totals</button>
+            </fieldset>
+        </form>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const foodData = {
+            chicken: { caloriesPerGram: 1.65, proteinPerGram: 0.31 },
+            rice: { caloriesPerGram: 1.30, proteinPerGram: 0.03 },
+            cottage_cheese: { caloriesPerGram: 0.98, proteinPerGram: 0.11 },
+        };
+
+        let dailyTotals = {
+            totalCalories: 0,
+            totalProtein: 0,
+            mealsEaten: [],
+        };
+
+        function addFoodItem() {
+            const container = document.getElementById('food-items-container');
+            const newFoodDiv = document.createElement('div');
+
+            newFoodDiv.innerHTML = `
+                <label for="food">Select a food:</label>
+                <select name="food">
+                    <option value="chicken">Chicken</option>
+                    <option value="rice">Rice</option>
+                    <option value="cottage_cheese">Cottage Cheese</option>
+                </select>
+                <input type="number" name="weight" placeholder="g" min="0.1" step="0.1">
+                <button type="button" onclick="removeFoodItem(this)">Remove</button>
+            `;
+
+            container.appendChild(newFoodDiv);
+        }
+
+        function removeFoodItem(element) {
+            element.parentElement.remove();
+        }
+
+        function updateTotals() {
+            const meal = document.getElementById('meal').value;
+            const foodItems = document.querySelectorAll('#food-items-container > div');
+            let mealCalories = 0;
+            let mealProtein = 0;
+
+            foodItems.forEach(item => {
+                const foodSelect = item.querySelector('select[name="food"]');
+                const weightInput = item.querySelector('input[name="weight"]');
+
+                if (foodSelect && weightInput && weightInput.value) {
+                    const food = foodSelect.value;
+                    const weight = parseFloat(weightInput.value);
+
+                    if (foodData[food]) {
+                        mealCalories += foodData[food].caloriesPerGram * weight;
+                        mealProtein += foodData[food].proteinPerGram * weight;
+                    }
+                }
+            });
+
+            dailyTotals.totalCalories += mealCalories;
+            dailyTotals.totalProtein += mealProtein;
+            dailyTotals.mealsEaten.push(meal);
+
+            displayTotals();
+            clearForm();
+        }
+
+        function displayTotals() {
+            const resultsDiv = document.getElementById('results');
+            const currentDate = new Date().toLocaleDateString();
+            const allMeals = ["Breakfast", "Lunch", "Dinner", "Snack"];
+            const mealsMissed = allMeals.filter(meal => !dailyTotals.mealsEaten.includes(meal));
+            const mealCounts = {};
+            dailyTotals.mealsEaten.forEach(meal => {
+                mealCounts[meal] = (mealCounts[meal] || 0) + 1;
+            });
+
+            let mealsEatenString = "";
+            for (const meal in mealCounts) {
+                mealsEatenString += `<p>${meal}: ${mealCounts[meal]} time(s)</p>`;
+            }
+
+            resultsDiv.innerHTML = `
+                <div class="total">
+                    <p>Date: ${currentDate}</p>
+                    <p>Total Calories: ${dailyTotals.totalCalories.toFixed(2)}</p>
+                    <p>Total Protein: ${dailyTotals.totalProtein.toFixed(2)}g</p>
+                    <p>Meals Eaten: </p>
+                    ${mealsEatenString}
+                    <p>Meals Missed: ${mealsMissed.join(", ")}</p>
+                </div>
+            `;
+        }
+        function clearForm(){
+            const container = document.getElementById('food-items-container');
+            container.innerHTML = `<div>
+                        <label for="food">Select a food:</label>
+                        <select name="food">
+                            <option value="chicken">Chicken</option>
+                            <option value="rice">Rice</option>
+                            <option value="cottage_cheese">Cottage Cheese</option>
+                        </select>
+                        <input type="number" name="weight" placeholder="g" min="0.1" step="0.1">
+                        <button type="button" onclick="removeFoodItem(this)">Remove</button>
+                    </div>`;
+            document.getElementById('meal').value = "Breakfast";
+        }
+    </script>
+</body>
+</html>
